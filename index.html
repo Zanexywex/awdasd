@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Share Text</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 60px;
+      height: 100%;
+    }
+
+    h2 {
+      color: #569CD6;
+    }
+
+    input[type="password"], textarea {
+      background-color: #1e1e1e;
+      border: 1px solid #3c3c3c;
+      color: #d4d4d4;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 4px;
+      outline: none;
+      width: 80%;
+      max-width: 800px;
+    }
+
+
+    button {
+      margin-top: 10px;
+      background-color: #0e639c;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1177bb;
+    }
+
+    #editorContainer {
+    display: flex;
+    justify-content: center;  /* จัดกึ่งกลางแนวนอน */
+    align-items: flex-start;  /* จัดชิดด้านบน */
+    width: 100%;
+    padding: 20px 0;          /* ให้ระยะบนล่างนิดหน่อย */
+    box-sizing: border-box;
+    }
+
+    textarea {
+    width: 95%;              /* กว้างเกือบเต็ม */
+    max-width: 1200px;       /* กำหนด max width */
+    height: 90vh;
+    resize: none;
+    border: 2px solid #3c3c3c;
+    border-radius: 6px;
+    outline: none;
+    padding: 16px;
+    font-size: 16px;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Courier New', monospace;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    display: block;
+    margin: 0 auto;          /* สำคัญ! บังคับให้อยู่กึ่งกลางด้วย margin */
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🔐 Enter Access Code</h2>
+  <input type="password" id="codeInput" placeholder="Enter code (e.g., wexxy)">
+  <button onclick="checkCode()">Join</button>
+
+  <div id="editorContainer" style="display:none;">
+    <textarea id="sharedText" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+  </div>
+
+  <script>
+    function checkCode() {
+      const code = document.getElementById('codeInput').value;
+      if (code === "wexxy") {
+        document.getElementById('codeInput').style.display = "none";
+        document.querySelector('button').style.display = "none";
+        document.getElementById('editorContainer').style.display = "block";
+        startSync();
+      } else {
+        alert("❌ Incorrect code!");
+      }
+    }
+
+    function startSync() {
+      const textarea = document.getElementById('sharedText');
+
+      // โหลดข้อความทันที
+      fetch("load.php")
+        .then(res => res.text())
+        .then(data => textarea.value = data);
+
+      // sync ทุก 0.8 วิ
+      setInterval(() => {
+        fetch("load.php")
+          .then(res => res.text())
+          .then(data => {
+            if (document.activeElement !== textarea) {
+              textarea.value = data;
+            }
+          });
+      }, 800);
+
+      // อัปเดตทันทีที่พิมพ์
+      textarea.addEventListener("input", () => {
+        const text = textarea.value;
+        fetch("save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "text=" + encodeURIComponent(text)
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
