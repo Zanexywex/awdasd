@@ -9,7 +9,3 @@ end)
 task.spawn(function()
     loadstring(game:HttpGet("https://api.realaya.xyz/v1/files/l/rowid0r5jyc7ll9iyushxoh4zclcqen2.lua"))() -- Go
 end)
-
-task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/61fbde2dbdc76aaeba292cf81dc0900a.lua"))() -- Nep
-end)
